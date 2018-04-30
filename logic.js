@@ -1,5 +1,34 @@
+const game = {
+
+	storage : localStorage,
+
+	getData : function()
+	{
+		if (this.storage.getItem('game')) {
+			return JSON.parse(this.storage.getItem('game')); 
+		} else {
+            // store the entire object
+			return {'game': Board()};
+		}
+	},
+
+    // pass the board state
+	saveData: function(obj)
+	{	
+		// set this for storage
+
+		// stringify before storing data
+		obj = JSON.stringify(obj)
+		this.storage.setItem('game',obj);
+	}
+}
+
+
+
+
 const Board = () => {
     const set = new Set();
+    
     const makeBoard = () => {
         var rows = 3;
         var cols = 3;
@@ -22,8 +51,8 @@ const Board = () => {
         var num = row * 10 + col;
         set.delete(num);
     }
-
-    return {removeCell, makeBoard};
+    const b_obj = makeBoard();
+    return {b_obj,removeCell, makeBoard};
 };
 
 const Player = () =>
@@ -146,24 +175,63 @@ const Player = () =>
 function driver(id)
 {      
     console.log(id);
+    // call on active state of an object
     console.log("here");
 }
 
 
-var test = Board();
-var arr = test.makeBoard();
-
-console.log(arr);
-
-var ply1 = Player();
-// ply1.addMove(1,1,true,arr);
-ply1.addMove(0,0,true,arr);
-ply1.addMove(0,1,true,arr);
-var result = ply1.addMove(0,2,true,arr);
-console.log(result);
-console.log(arr);
-
-
 $( document ).ready(function() {
-    document.getElementById("00");
+
+    // game.getData();
+
+    // returns a HashMap
+    var board_obj = game.getData();
+
+    var arr = board_obj['game'].b_obj
+
+    console.log(arr);
+
+    // var ply1 = Player();
+    // ply1.addMove(1,1,true,arr);
+    // console.log(arr)
+
+
 });
+
+// var test = Board();
+// var arr = test.makeBoard();
+
+// console.log(arr);
+
+// var ply1 = Player();
+// // ply1.addMove(1,1,true,arr);
+// ply1.addMove(0,0,true,arr);
+// ply1.addMove(0,1,true,arr);
+// var result = ply1.addMove(0,2,true,arr);
+// console.log(result);
+// console.log(arr);
+
+
+
+// $( document ).ready(function() {
+//     document.getElementById("00");
+// });
+
+
+// Testing stuff
+
+// var test = Board();
+// var arr = test.makeBoard();
+
+// // console.log(arr);
+
+// var ply1 = Player();
+// ply1.addMove(1,1,true,arr);
+
+// // var str = JSON.stringify(test)
+// var parse = test.toString();
+
+// console.log(parse);
+
+// var unparse = JSON.parse(parse);
+// console.log(unparse);
