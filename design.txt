@@ -1,0 +1,19 @@
+Logic for board:
+	
+	check_win(x,y):
+
+		check x row
+		check y col
+		check both diagonals
+
+		if board filled:
+			tie !
+
+Components:
+	
+	gameboard
+	players to add to board
+
+
+Gameboard object	
+	store the array
