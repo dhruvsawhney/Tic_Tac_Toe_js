@@ -113,13 +113,22 @@ class Board {
         return false;
     }
     
-    addCell(rcPair)
+    addCell(rcPair,flag)
     {   
         // not a valid element
         if(!this.validCells.includes(rcPair)){
             return false;
         }
         
+        var r = parseInt(rcPair.charAt(0));
+        var c = parseInt(rcPair.charAt(1));
+
+        if(flag){
+            this.board[r][c] = 'x';
+        } else {
+            this.board[r][c] = 'o';
+        }
+
         var index = this.validCells.indexOf(rcPair);
 
         var arr1 = this.validCells.slice(0,index)
@@ -137,10 +146,14 @@ class Board {
 // console.log(b.addCell("01"));
 // console.log(b.addCell("00"));
 
+var flag = true;
 
 
 table.addEventListener('click',(e)=> 
-{
+{   
+
+    console.log(flag);
+
     var cell = e.target;
 
     
@@ -151,15 +164,26 @@ table.addEventListener('click',(e)=>
     var board_obj = new Board()
     board_obj.setData(persist.board,persist.validCells)
 
-    var isValid = board_obj.addCell(cell.id);
+    var isValid = board_obj.addCell(cell.id,flag);
 
     if(isValid)
     {   
         console.log("here");
-        cell.textContent = 'x';
+        if(flag){
+            cell.textContent = 'x';
+        } else {
+            cell.textContent = 'o';
+        }
+        
     }
 
     state.saveData(board_obj);
+
+    if(flag === true){
+        flag = false;
+    } else {
+        flag = true;
+    }
 
 })
 
