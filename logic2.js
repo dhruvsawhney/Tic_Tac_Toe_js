@@ -153,8 +153,12 @@ class Board {
 // console.log(b.addCell("00"));
 
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
-table.addEventListener('click',(e)=> 
+  
+ table.addEventListener('click',(e)=> 
 {   
 
     console.log(flag);
@@ -173,7 +177,7 @@ table.addEventListener('click',(e)=>
 
     if(isValid)
     {   
-        console.log("here");
+
         if(flag){
             cell.textContent = 'x';
         } else {
@@ -185,6 +189,10 @@ table.addEventListener('click',(e)=>
     state.saveData(board_obj);
 
     var result = board_obj.checkGame(cell.id,flag);
+
+    if(!result && board_obj.validCells.length === 0){
+        alert("it's a tie!");
+    }
 
     if(result){
         if(flag){
