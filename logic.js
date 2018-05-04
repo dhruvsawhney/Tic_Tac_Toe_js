@@ -171,9 +171,15 @@ function reset() {
 
     if(isValid)
     {   
-
+        
         if(flag){
-            cell.textContent = 'x';
+            const val = document.createElement('h1');
+            val.align = "center";
+            val.textContent = 'x';
+            console.log(val);
+            cell.textContent = val.textContent;
+            // cell.innerHTML = <h1 align= "center">'x'</h1>;
+
         } else {
             cell.textContent = 'o';
         }
