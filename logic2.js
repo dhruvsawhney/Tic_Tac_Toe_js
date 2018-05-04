@@ -1,5 +1,3 @@
-
-
 const table = document.getElementById("game");
 
 const state = {
@@ -20,7 +18,8 @@ const state = {
 
         // stringify before storing data
         strObj = JSON.stringify(obj);
-        console.log(strObj);
+        console.log("saved data is: ")
+        console.log(strObj)
 		this.storage.setItem('game',strObj);
     },
     
@@ -48,6 +47,10 @@ class Board {
         this.validCells = ["00","01","02","10","11","12","20","21","22"];
     }
 
+    setData(board, validCells){
+        this.board = board;
+        this.validCells = validCells;
+    }
     //check who has won
     // flag: true = x, false = y
 
@@ -139,17 +142,15 @@ class Board {
 table.addEventListener('click',(e)=> 
 {
     var cell = e.target;
-    console.log(cell);
-
-
-    // var r = parseInt(cell.id.charAt(0))
-    // var c = parseInt(cell.id.charAt(1))
 
     
     // get the data
 
-    var board_obj = state.getData();
-    console.log(board_obj);
+    var persist = state.getData();
+
+    var board_obj = new Board()
+    board_obj.setData(persist.board,persist.validCells)
+
     var isValid = board_obj.addCell(cell.id);
 
     if(isValid)
