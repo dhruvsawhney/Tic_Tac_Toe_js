@@ -184,15 +184,15 @@ table.addEventListener('click',(e)=>
 
     state.saveData(board_obj);
 
-    // var result = board_obj.checkGame(cell.id,flag);
+    var result = board_obj.checkGame(cell.id,flag);
 
-    // if(result){
-    //     if(flag){
-    //         alert("Player 1 has won");
-    //     } else{
-    //         alert("Player 2 has won");
-    //     }
-    // }
+    if(result){
+        if(flag){
+            alert("Player 1 has won");
+        } else{
+            alert("Player 2 has won");
+        }
+    }
     
 
     if(flag === true){
