@@ -1,4 +1,6 @@
 const table = document.getElementById("game");
+// to know the player
+var flag = true;
 
 const state = {
 	storage : localStorage,
@@ -54,9 +56,13 @@ class Board {
     //check who has won
     // flag: true = x, false = y
 
-    checkGame (row, col, flag)
-    {
-        var valid_var = flag ? x : y;
+    checkGame (rcPair, flag)
+    {   
+
+        var row = parseInt(rcPair.charAt(0));
+        var col = parseInt(rcPair.charAt(1));
+
+        var valid_var = flag ? 'x' : 'o';
 
         var isWon = true;
 
@@ -146,7 +152,6 @@ class Board {
 // console.log(b.addCell("01"));
 // console.log(b.addCell("00"));
 
-var flag = true;
 
 
 table.addEventListener('click',(e)=> 
@@ -178,6 +183,17 @@ table.addEventListener('click',(e)=>
     }
 
     state.saveData(board_obj);
+
+    // var result = board_obj.checkGame(cell.id,flag);
+
+    // if(result){
+    //     if(flag){
+    //         alert("Player 1 has won");
+    //     } else{
+    //         alert("Player 2 has won");
+    //     }
+    // }
+    
 
     if(flag === true){
         flag = false;
