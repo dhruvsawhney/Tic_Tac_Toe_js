@@ -1,59 +1,101 @@
-const game = {
-
-	storage : localStorage,
-
-	getData : function()
-	{
-		if (this.storage.getItem('game')) {
-			return JSON.parse(this.storage.getItem('game')); 
-		} else {
-            // store the entire object
-			return {'game': Board()};
-		}
-	},
-
-    // pass the board state
-	saveData: function(obj)
-	{	
-		// set this for storage
-
-		// stringify before storing data
-		obj = JSON.stringify(obj)
-		this.storage.setItem('game',obj);
-	}
-}
 
 
+// const g = {
+
+// 	storage : localStorage,
+
+// 	getData : function()
+// 	{
+// 		if (this.storage.getItem('game')) {
+// 			return JSON.parse(this.storage.getItem('game')); 
+// 		} else {
+//             // store the entire object
+//             return {'game': Board()};
+// 		}
+// 	},
+
+//     // pass the board state
+//     // input: the Board state
+// 	saveData: function(obj)
+// 	{	
+// 		// set this for storage
+
+//         // stringify before storing data
+//         console.log("Saving the obj");
+//         console.log(obj);
+
+//         var hash  = {'game' : obj}
+//         hash = JSON.stringify(hash) 
+//         console.log("before str")
+//         console.log(hash);
+// 		this.storage.setItem('game',hash);
+// 	}
+// }
 
 
 const Board = () => {
-    const set = new Set();
     
+    const set = [];
     const makeBoard = () => {
+        set.push("00");
+        set.push("01");
+        set.push("02");
+
         var rows = 3;
         var cols = 3;
         var arr = new Array();
 
         for(var i = 0; i < rows; i++){
             arr[i] = new Array();
-            for(var j = 0; j < cols; j++){
+            for(var j = 0; j < cols; j++){                
                 arr[i][j] = "";
-                var num = i*10 + j;
-                set.add(num);
+                if(i != 0){
+                    var num = i*10 + j;
+                    set.push(num.toString());
+                }
+            
             }
         }
         return arr;
     }
 
+
     // remove the valid state from the r,c
-    const removeCell = (row, col) =>
+    removeCell = (row, col) =>
     {   
         var num = row * 10 + col;
         set.delete(num);
     }
+
+    // the actual board
     const b_obj = makeBoard();
-    return {b_obj,removeCell, makeBoard};
+
+
+    const cell_isActive = (rcNum) =>
+    {
+        return set.includes(rcNum);
+    }
+
+    return {removeCell, cell_isActive};
 };
+
+
+var b = Board();
+
+
+// $( document ).ready(function() {
+    
+//     console.log(b);
+//     console.log(b.cell_isActive("00"));
+//     // g.saveData(b);
+
+//     // var getGame = g.getData();
+//     // console.log(getGame['game'])
+
+// });
+
+
+
 
 const Player = () =>
 {   
@@ -172,66 +214,63 @@ const Player = () =>
 };
 
 
+
 function driver(id)
 {      
     console.log(id);
+    
     // call on active state of an object
+    // console.log("here");
+
+    var num = parseInt(id);
+    var col = num%10;
+    var row = (num/10)%10;
+
     console.log("here");
+    // var hash = g.getData();
+    // console.log(hash);
+
+    // var board_obj = hash['game'];
+
+    // console.log(board_obj);
+
+    if (b.cell_isActive(num) === false){
+        return;
+    }
+
+    b.removeCell(row,col);
+
+    document.getElementById(id).innerHTML = "X";
+
+    console.log("call");
+    // game.saveData(board_obj);
+
 }
 
 
 $( document ).ready(function() {
+    
 
-    // game.getData();
+    // // game.getData();
 
-    // returns a HashMap
-    var board_obj = game.getData();
+    // // returns a HashMap
+    // var board_obj = game.getData();
+    // var arr = board_obj['game'].b_obj
 
-    var arr = board_obj['game'].b_obj
-
-    console.log(arr);
+    // console.log(arr);
 
     // var ply1 = Player();
     // ply1.addMove(1,1,true,arr);
     // console.log(arr)
 
+    // // save the data
+    // game.saveData(board_obj);
+
+    // var board_obj = game.getData();
+
+    // var arr = board_obj['game'].b_obj
+
+    // console.log(arr);
 
 });
 
-// var test = Board();
-// var arr = test.makeBoard();
-
-// console.log(arr);
-
-// var ply1 = Player();
-// // ply1.addMove(1,1,true,arr);
-// ply1.addMove(0,0,true,arr);
-// ply1.addMove(0,1,true,arr);
-// var result = ply1.addMove(0,2,true,arr);
-// console.log(result);
-// console.log(arr);
-
-
-
-// $( document ).ready(function() {
-//     document.getElementById("00");
-// });
-
-
-// Testing stuff
-
-// var test = Board();
-// var arr = test.makeBoard();
-
-// // console.log(arr);
-
-// var ply1 = Player();
-// ply1.addMove(1,1,true,arr);
-
-// // var str = JSON.stringify(test)
-// var parse = test.toString();
-
-// console.log(parse);
-
-// var unparse = JSON.parse(parse);
-// console.log(unparse);
