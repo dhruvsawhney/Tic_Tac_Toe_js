@@ -1,117 +1,72 @@
+const table = document.getElementById("game");
+// to know the player
+var flag = true;
 
+const state = {
+	storage : localStorage,
+	getData : function()
+	{
+		if (this.storage.getItem('game')) {
+			return JSON.parse(this.storage.getItem('game')); 
+		} else {
+            // store the entire object
+            return new Board();
+		}
+	},
+    // pass the board state
+    // input: the Board state
+	saveData: function(obj)
+	{	
 
-// const g = {
-
-// 	storage : localStorage,
-
-// 	getData : function()
-// 	{
-// 		if (this.storage.getItem('game')) {
-// 			return JSON.parse(this.storage.getItem('game')); 
-// 		} else {
-//             // store the entire object
-//             return {'game': Board()};
-// 		}
-// 	},
-
-//     // pass the board state
-//     // input: the Board state
-// 	saveData: function(obj)
-// 	{	
-// 		// set this for storage
-
-//         // stringify before storing data
-//         console.log("Saving the obj");
-//         console.log(obj);
-
-//         var hash  = {'game' : obj}
-//         hash = JSON.stringify(hash) 
-//         console.log("before str")
-//         console.log(hash);
-// 		this.storage.setItem('game',hash);
-// 	}
-// }
-
-
-const Board = () => {
+        // stringify before storing data
+        strObj = JSON.stringify(obj);
+        console.log("saved data is: ")
+        console.log(strObj)
+		this.storage.setItem('game',strObj);
+    },
     
-    const set = [];
-    const makeBoard = () => {
-        set.push("00");
-        set.push("01");
-        set.push("02");
+    removeData: function()
+    {
+        this.storage.removeItem('game');
+    }
+}
 
-        var rows = 3;
-        var cols = 3;
-        var arr = new Array();
+class Board {
+    constructor() {
+        this.board = function () {
+            var rows = 3;
+            var cols = 3;
+            var arr = new Array();
 
-        for(var i = 0; i < rows; i++){
-            arr[i] = new Array();
-            for(var j = 0; j < cols; j++){                
-                arr[i][j] = "";
-                if(i != 0){
-                    var num = i*10 + j;
-                    set.push(num.toString());
+            for(var i = 0; i < rows; i++){
+                arr[i] = new Array();
+                for(var j = 0; j < cols; j++){                
+                    arr[i][j] = "";
                 }
-            
             }
-        }
-        return arr;
+            return arr;
+        }();
+        this.validCells = ["00","01","02","10","11","12","20","21","22"];
     }
 
-
-    // remove the valid state from the r,c
-    removeCell = (row, col) =>
-    {   
-        var num = row * 10 + col;
-        set.delete(num);
+    setData(board, validCells){
+        this.board = board;
+        this.validCells = validCells;
     }
-
-    // the actual board
-    const b_obj = makeBoard();
-
-
-    const cell_isActive = (rcNum) =>
-    {
-        return set.includes(rcNum);
-    }
-
-    return {removeCell, cell_isActive};
-};
-
-
-var b = Board();
-
-
-// $( document ).ready(function() {
     
-//     console.log(b);
-//     console.log(b.cell_isActive("00"));
-//     // g.saveData(b);
 
-//     // var getGame = g.getData();
-//     // console.log(getGame['game'])
+    checkGame (rcPair, flag)
+    {   
 
-// });
+        var row = parseInt(rcPair.charAt(0));
+        var col = parseInt(rcPair.charAt(1));
 
-
-
-
-const Player = () =>
-{   
-    const x = "X";
-    const y = "Y";
-   
-    //check who has won
-    // flag: true = x, false = y
-    checkGame = (row, col, flag, board) =>
-    {
-        var valid_var = flag ? x : y;
+        var valid_var = flag ? 'x' : 'o';
 
         var isWon = true;
 
-        for(var i = 0; i < board.length; i++){
-            if(board[row][i] !== valid_var){
+        for(var i = 0; i < this.board.length; i++){
+            if(this.board[row][i] !== valid_var){
                 isWon = false;
                 break;
             }
@@ -122,8 +77,8 @@ const Player = () =>
         }
 
         isWon = true;
-        for(var i = 0; i < board.length; i++){
-            if(board[i][col] !== valid_var){
+        for(var i = 0; i < this.board.length; i++){
+            if(this.board[i][col] !== valid_var){
                 isWon = false;
                 break;
             }
@@ -134,8 +89,8 @@ const Player = () =>
         }
 
         isWon = true;
-        for(var i = 0; i < board.length; i++){
-            if(board[i][i] !== valid_var)
+        for(var i = 0; i < this.board.length; i++){
+            if(this.board[i][i] !== valid_var)
             {
                 isWon = false;
                 break;
@@ -148,8 +103,8 @@ const Player = () =>
 
         isWon = true;
 
-        for(var i = 0; i < board.length; i++){
-            if(board[board.length-1-i][i] !== valid_var)
+        for(var i = 0; i < this.board.length; i++){
+            if(this.board[this.board.length-1-i][i] !== valid_var)
             {
                 isWon = false;
                 break;
@@ -161,116 +116,105 @@ const Player = () =>
         }
 
         return false;
-    }   
-    
-     // arrays and objects are passed by reference (by-default) in JS
-     // add move to the board
-     addMove = (row, col, flag, board) =>
-     {  
-         // check for errors
-         if (row < 0 || row >= board.length)
-         {
-             alert("invalid row");
-             return;
-         }
- 
-         if(col < 0 || col >= board.length)
-         {
-             alert("invalid column");
-             return;
-         }
- 
-         if(board[row][col] !== "" )
-         {
-             alert("aleary taken");
-             return;
-         }
- 
-         if(flag)
-         {
-             board[row][col] = x;
-         } 
-         else
-         {
-            board[row][col] = y;
-         }
-         
-         console.log("before");
-         var result = checkGame(row,col,flag,board);
-         console.log("after");
-
-         if(result)
-         {
-             if(flag)
-             {
-                 return "Player X won";
-             }
-             return "Player Y won";
-         }
-         return "go on";
-     }
- 
-    return {addMove};
-};
-
-
-
-function driver(id)
-{      
-    console.log(id);
-    
-    // call on active state of an object
-    // console.log("here");
-
-    var num = parseInt(id);
-    var col = num%10;
-    var row = (num/10)%10;
-
-    console.log("here");
-    // var hash = g.getData();
-    // console.log(hash);
-
-    // var board_obj = hash['game'];
-
-    // console.log(board_obj);
-
-    if (b.cell_isActive(num) === false){
-        return;
     }
+    
+    addCell(rcPair,flag)
+    {   
+        // not a valid element
+        if(!this.validCells.includes(rcPair)){
+            return false;
+        }
+        
+        var r = parseInt(rcPair.charAt(0));
+        var c = parseInt(rcPair.charAt(1));
 
-    b.removeCell(row,col);
+        if(flag){
+            this.board[r][c] = 'x';
+        } else {
+            this.board[r][c] = 'o';
+        }
 
-    document.getElementById(id).innerHTML = "X";
+        var index = this.validCells.indexOf(rcPair);
 
-    console.log("call");
-    // game.saveData(board_obj);
+        var arr1 = this.validCells.slice(0,index)
+        var arr2 = this.validCells.slice(index+1)
 
+        this.validCells = arr1.concat(arr2);
+        
+        return true;
+    }
 }
 
+// Clear all the data
+function reset() {
+    state.removeData();
+    location.reload();
+}
 
-$( document ).ready(function() {
+  
+ table.addEventListener('click',(e)=> 
+{   
+
+    console.log(flag);
+
+    var cell = e.target;
+
+    
+    // get the data
+
+    var persist = state.getData();
+
+    var board_obj = new Board()
+    board_obj.setData(persist.board,persist.validCells)
+
+    var isValid = board_obj.addCell(cell.id,flag);
+
+    if(isValid)
+    {   
+
+        if(flag){
+            cell.textContent = 'x';
+        } else {
+            cell.textContent = 'o';
+        }
+        
+    }
+
+    state.saveData(board_obj);
+
+    var result = board_obj.checkGame(cell.id,flag);
+
+    if(!result && board_obj.validCells.length === 0){
+        alert("it's a tie!");
+    }
+
+    if(result){
+        if(flag){
+            alert("Player 1 has won");
+        } else{
+            alert("Player 2 has won");
+        }
+    }
     
 
-    // // game.getData();
+    if(flag === true){
+        flag = false;
+    } else {
+        flag = true;
+    }
 
-    // // returns a HashMap
-    // var board_obj = game.getData();
-    // var arr = board_obj['game'].b_obj
+})
 
-    // console.log(arr);
 
-    // var ply1 = Player();
-    // ply1.addMove(1,1,true,arr);
-    // console.log(arr)
+// Sessions work
 
-    // // save the data
-    // game.saveData(board_obj);
+// var test = state.getData();
+// test.board[0][0] = "aa";
+// console.log(test.board);
+// state.saveData(test);
 
-    // var board_obj = game.getData();
-
-    // var arr = board_obj['game'].b_obj
-
-    // console.log(arr);
-
-});
-
+// console.log("Retrieve data")
+// console.log(state.getData())
+// console.log("clear data")
+// state.removeData();
+// console.log(state.getData())
