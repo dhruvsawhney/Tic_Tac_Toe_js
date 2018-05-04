@@ -1,4 +1,5 @@
 
+
 const table = document.getElementById("game");
 
 const state = {
@@ -148,6 +149,7 @@ table.addEventListener('click',(e)=>
     // get the data
 
     var board_obj = state.getData();
+    console.log(board_obj);
     var isValid = board_obj.addCell(cell.id);
 
     if(isValid)
@@ -156,6 +158,7 @@ table.addEventListener('click',(e)=>
         cell.textContent = 'x';
     }
 
+    state.saveData(board_obj);
 
 })
 
