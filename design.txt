@@ -1,19 +1,5 @@
-Logic for board:
-	
-	check_win(x,y):
+Make the x/o bigger on the screen
 
-		check x row
-		check y col
-		check both diagonals
+Add functionality for player names and redirect to another page
 
-		if board filled:
-			tie !
-
-Components:
-	
-	gameboard
-	players to add to board
-
-
-Gameboard object	
-	store the array
+Make AI version

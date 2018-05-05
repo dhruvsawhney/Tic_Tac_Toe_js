@@ -20,8 +20,8 @@ const state = {
 
         // stringify before storing data
         strObj = JSON.stringify(obj);
-        console.log("saved data is: ")
-        console.log(strObj)
+        // console.log("saved data is: ")
+        // console.log(strObj)
 		this.storage.setItem('game',strObj);
     },
     
@@ -155,10 +155,11 @@ function reset() {
  table.addEventListener('click',(e)=> 
 {   
 
-    console.log(flag);
+    // console.log(flag);
 
     var cell = e.target;
 
+    console.log(cell);
     
     // get the data
 
@@ -171,19 +172,20 @@ function reset() {
 
     if(isValid)
     {   
-        
+        const h = document.createElement('h1');
+        h.align = "center";
+
         if(flag){
-            const val = document.createElement('h1');
-            val.align = "center";
-            val.textContent = 'x';
-            console.log(val);
-            cell.textContent = val.textContent;
-            // cell.innerHTML = <h1 align= "center">'x'</h1>;
+            
+            var t = document.createTextNode("x");
+            h.appendChild(t);
 
         } else {
-            cell.textContent = 'o';
+            var t = document.createTextNode("o");
+            h.appendChild(t);
         }
         
+        cell.appendChild(h);
     }
 
     state.saveData(board_obj);
