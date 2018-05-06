@@ -253,18 +253,23 @@ class Board {
         // console.log(this.validCells)
         for(let i = 0; i < this.board.length; i++){
             for(let j = 0; j < this.board[i].length; j++){
-                this.board[i][j] = this.player;
+
+                if(this.isOpen(i,j)){
+                    this.board[i][j] = this.player;
             
-                var score = this.minimax(0,true);
-                if(score > bestScore){
-                    bestRow = row;
-                    bestCol = col;
+                    var score = this.minimax(0,true);
+                    if(score > bestScore){
+                        bestRow = i;
+                        bestCol = j;
+                        bestScore = score;
+                    }
+            
+                    this.board[i][j] = "";
                 }
-        
-                this.board[row][col] = "";
+                
             }
         }
-               
+        return [bestRow,bestCol,bestScore];
     }        
         
     
@@ -354,7 +359,21 @@ function sleep (time) {
 
 // Debug AI
 b = new Board();
-b.findMove()
+var res = b.findMove()
+console.log(res);
+b.board[0][0] = 'x';
+b.board[0][1] = 'o';
+var res = b.findMove()
+console.log(res);
+
+b.board[0][2] = 'x';
+b.board[1][0] = 'o';
+var res = b.findMove()
+console.log(res);
+b.board[1][1] = 'x';
+b.board[2][0] = 'o';
+var res = b.findMove()
+console.log(res);
 
 // var array = [2, 5, 9];
 // var index = array.indexOf(5);
