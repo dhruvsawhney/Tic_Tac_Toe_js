@@ -151,6 +151,12 @@ function reset() {
     location.reload();
 }
 
+
+// https://zeit.co/blog/async-and-await
+function sleep (time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+  }
+
   
  table.addEventListener('click',(e)=> 
 {   
@@ -202,6 +208,10 @@ function reset() {
         } else{
             alert("Player 2 has won");
         }
+        // sleep for user effect
+        sleep(1000).then(() => {
+          reset();
+        })
     }
     
 
@@ -212,6 +222,8 @@ function reset() {
     }
 
 })
+
+
 
 
 // Sessions work
