@@ -159,92 +159,90 @@ class Board {
         return true;
     }
 
-    // evaluation function
+    // evaluation function should be static
     evaluate(flag) {
-        // var cell_val = flag ? 'x' : 'o';
-        if(this.validCells.length === 0){
-            return 0;
-        } else {
-            // check self or opponent
-            for(let i = 0; i < this.validCells.length; i++){
-                var rcPair = this.validCells[i];
-
+        for(let i = 0; i < this.board.length; i++){
+            for(let j = 0; j < this.board[i].length; j++){
+                var r = i.toString();
+                var c = j.toString();
+                var rcPair = r + c;
                 if(this.checkGame(rcPair,flag,false)){
                     return 10;
                 }
-
+        
                 if(this.checkGame(rcPair,flag,true)){
                     return -10;
                 }
             }
-            // ends in a tie
-            return 0;
         }
+        // ends in a tie
+        return 0;
     }
 
+    checkOver(){
+        for(let i = 0; i < this.board.length; i++){
+            for(let j = 0; j < this.board[i].length; j++){
+                if(this.board[i][j] !== ""){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-    //
+    isOpen(i,j){
+        return this.board[i][j] === "";
+    }
 
     // the flag
-    
     minimax(depth,isMaxPlayer){
-        console.log(this.count)
-        // in terminal state
-        if(this.validCells.length === 0){
+        if(this.checkOver){
             return this.evaluate(this.flag)
         } else {
 
             if(isMaxPlayer){
                 var bestMax = -10000;
 
-                for(let i = 0; i < this.validCells.length; i++ ){
-                    var rcPair = this.validCells[i];
-                    var row = parseInt(rcPair.charAt(0));
-                    var col = parseInt(rcPair.charAt(1));
+                for(let i = 0; i < this.board.length; i++){
+                    for(let j = 0; j < this.board[i].length; j++){
+                        
+                        if(this.isOpen(i,j)){
+                            
+                            this.board[i][j] = this.player;
 
-                    this.board[row][col] = this.player;
-                    // remove in-place
-                    this.validCells.splice(i,1)
+                            var score = this.minimax(depth +1, !isMaxPlayer);
+                        
+                            this.board[row][col] = "";
 
-                    var score = this.minimax(depth +1, !isMaxPlayer);
-                    
-                    // add-back
-                    this.validCells.splice(i,0,rcPair)
-                    this.board[row][col] = '';
-
-                    if(score > bestMax){
-                        bestMax = score
+                            if(score > bestMax){
+                                bestMax = score
+                                }
+                            }
+                        }
                     }
+                    return bestMax;
+                
+                } else {
+                    var bestMin = 10000;
+                    for(let i = 0; i < this.board.length; i++){
+                        for(let j = 0; j < this.board[i].length; j++){
+                            
+                            if(this.isOpen(i,j)){
+                                
+                                this.board[i][j] = this.opponent;
+    
+                                var score = this.minimax(depth +1, !isMaxPlayer);
+                                
+                                this.board[row][col] = "";
+    
+                                if(score < bestMin){
+                                    bestMin = score
+                                    }
+                                }
+                            }
+                        }
+                        return bestMin;
                 }
-                this.count +=1
-                return bestMax;
-            
-            } else {
-                var bestMin = 10000;
-
-                for(let i = 0; i < this.validCells.length; i++ ){
-                    var rcPair = this.validCells[i];
-                    var row = parseInt(rcPair.charAt(0));
-                    var col = parseInt(rcPair.charAt(1));
-
-                    this.board[row][col] = this.player;
-                    // remove in-place
-                    this.validCells.splice(i,1)
-
-                    var score = this.minimax(depth +1, !isMaxPlayer);
-
-                    // add-back
-                    this.validCells.splice(i,0,rcPair)
-                    this.board[row][col] = '';
-
-                    if(score < bestMin){
-                        bestMin = score
-                    }
-                }
-                this.count +=1
-                return bestMin;
-            }
-            
         }
     }
 
@@ -253,34 +251,23 @@ class Board {
         var bestCol = -1;
         var bestScore = -1;
         // console.log(this.validCells)
-        for(let i = this.validCells.length-1; i >= 0; i-- ){
-            var rcPair = this.validCells[i];
-            var row = parseInt(rcPair.charAt(0));
-            var col = parseInt(rcPair.charAt(1));
+        for(let i = 0; i < this.board.length; i++){
+            for(let j = 0; j < this.board[i].length; j++){
+                this.board[i][j] = this.player;
             
-
-            this.board[row][col] = this.player;
-            // remove in-place
-            this.validCells.splice(i,1)
-
-            // this.validCells =  this.validCells.splice(i, 1, rcPair);
-            
-            // console.log("Before")
-            // console.log(this.validCells)
-            
-            var score = this.minimax(0,true);
-            if(score > bestScore){
-                bestRow = row;
-                bestCol = col;
+                var score = this.minimax(0,true);
+                if(score > bestScore){
+                    bestRow = row;
+                    bestCol = col;
+                }
+        
+                this.board[row][col] = "";
             }
-            // add-back
-            this.validCells.splice(i,0,rcPair)
-            // this.validCells =this.validCells.splice(i, 0, rcPair);
-            // console.log("After")
-            // console.log(this.validCells)
-            this.board[row][col] = "";
         }
-    }
+               
+    }        
+        
+    
     
 }
 
