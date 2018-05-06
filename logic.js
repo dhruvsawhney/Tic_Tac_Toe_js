@@ -167,10 +167,14 @@ class Board {
                 var c = j.toString();
                 var rcPair = r + c;
                 if(this.checkGame(rcPair,flag,false)){
+                    console.log(i.toString() + " " +  j.toString() + " " + "10")
+                    console.log()
                     return 10;
                 }
         
                 if(this.checkGame(rcPair,flag,true)){
+                    console.log(i.toString() + " " +  j.toString() +" " + "-10")
+                    console.log()
                     return -10;
                 }
             }
@@ -194,70 +198,85 @@ class Board {
         return this.board[i][j] === "";
     }
 
-    // the flag
+    // the flag wrt comp ('x')
     minimax(depth,isMaxPlayer){
+        var score = this.evaluate(this.flag);
+
+        if(score === 10){
+            return 10;
+        }
+
+        if(score === -10){
+            return -10
+        }
+
         if(this.checkOver){
-            return this.evaluate(this.flag)
-        } else {
+            return 0;
+        }
 
-            if(isMaxPlayer){
-                var bestMax = -10000;
+        if(isMaxPlayer){
+            var bestMax = -10000;
 
+            for(let i = 0; i < this.board.length; i++){
+                for(let j = 0; j < this.board[i].length; j++){
+                    
+                    if(this.isOpen(i,j)){
+                        
+                        this.board[i][j] = this.player;
+                        isMaxPlayer = !isMaxPlayer
+                        console.log(this.board)
+                        var score = this.minimax(depth +1, isMaxPlayer);
+                    
+                        this.board[row][col] = "";
+
+                        if(score > bestMax){
+                            bestMax = score
+                            }
+                        }
+                    }
+                }
+                return bestMax;
+            
+            } else {
+                var bestMin = 10000;
                 for(let i = 0; i < this.board.length; i++){
                     for(let j = 0; j < this.board[i].length; j++){
                         
                         if(this.isOpen(i,j)){
-                            
-                            this.board[i][j] = this.player;
 
-                            var score = this.minimax(depth +1, !isMaxPlayer);
-                        
+                            this.board[i][j] = this.opponent;
+                            
+                            isMaxPlayer = !isMaxPlayer
+
+                            console.log(this.board)
+                            var score = this.minimax(depth +1, isMaxPlayer);
+                            
                             this.board[row][col] = "";
 
-                            if(score > bestMax){
-                                bestMax = score
+                            if(score < bestMin){
+                                bestMin = score
                                 }
                             }
                         }
                     }
-                    return bestMax;
-                
-                } else {
-                    var bestMin = 10000;
-                    for(let i = 0; i < this.board.length; i++){
-                        for(let j = 0; j < this.board[i].length; j++){
-                            
-                            if(this.isOpen(i,j)){
-                                
-                                this.board[i][j] = this.opponent;
-    
-                                var score = this.minimax(depth +1, !isMaxPlayer);
-                                
-                                this.board[row][col] = "";
-    
-                                if(score < bestMin){
-                                    bestMin = score
-                                    }
-                                }
-                            }
-                        }
-                        return bestMin;
-                }
+                return bestMin;
         }
+        
     }
 
     findMove(){
         var bestRow = -1;
         var bestCol = -1;
-        var bestScore = -1;
-        // console.log(this.validCells)
+        var bestScore = -1000000;
         for(let i = 0; i < this.board.length; i++){
             for(let j = 0; j < this.board[i].length; j++){
 
                 if(this.isOpen(i,j)){
+
                     this.board[i][j] = this.player;
             
-                    var score = this.minimax(0,true);
+                    var score = this.minimax(0,false);
+                    console.log ("score is: " + score.toString())
                     if(score > bestScore){
                         bestRow = i;
                         bestCol = j;
@@ -266,9 +285,9 @@ class Board {
             
                     this.board[i][j] = "";
                 }
-                
             }
         }
+
         return [bestRow,bestCol,bestScore];
     }        
         
@@ -357,31 +376,21 @@ function sleep (time) {
 })
 
 
-// Debug AI
+
 b = new Board();
-var res = b.findMove()
-console.log(res);
-b.board[0][0] = 'x';
-b.board[0][1] = 'o';
-var res = b.findMove()
-console.log(res);
+b.board[0][0] = 'x'
+b.board[0][1] = 'o'
+b.board[0][2] = 'x'
+b.board[1][0] = 'o'
+b.board[1][1] = 'o'
+b.board[1][2] = 'x'
+console.log(b.board)
 
-b.board[0][2] = 'x';
-b.board[1][0] = 'o';
-var res = b.findMove()
-console.log(res);
-b.board[1][1] = 'x';
-b.board[2][0] = 'o';
-var res = b.findMove()
-console.log(res);
+var move = b.findMove()
+console.log(move)
 
-// var array = [2, 5, 9];
-// var index = array.indexOf(5);
-// if (index > -1) {
-//   array.splice(index, 1);
-// }
 
-// console.log(array)
+
 
 
 // Sessions work
