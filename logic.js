@@ -47,6 +47,11 @@ class Board {
             return arr;
         }();
         this.validCells = ["00","01","02","10","11","12","20","21","22"];
+        // true -> x, false -> y
+        this.flag = true;
+        this.player = this.flag ? 'x':'o';
+        this.opponent = this.flag ? 'o' : 'x';
+        this.count = 0;
     }
 
     setData(board, validCells){
@@ -55,13 +60,23 @@ class Board {
     }
     
 
-    checkGame (rcPair, flag)
+    // check if the game has been won
+    checkGame (rcPair, flag, checkOpp)
     {   
 
         var row = parseInt(rcPair.charAt(0));
         var col = parseInt(rcPair.charAt(1));
 
         var valid_var = flag ? 'x' : 'o';
+        
+        // flip the valid_var to check if the opponent has won
+        if(checkOpp){
+            if(valid_var === 'x'){
+                valid_var = 'o';
+            } else{
+                valid_var = 'x';
+            }
+        }
 
         var isWon = true;
 
@@ -143,6 +158,130 @@ class Board {
         
         return true;
     }
+
+    // evaluation function
+    evaluate(flag) {
+        // var cell_val = flag ? 'x' : 'o';
+        if(this.validCells.length === 0){
+            return 0;
+        } else {
+            // check self or opponent
+            for(let i = 0; i < this.validCells.length; i++){
+                var rcPair = this.validCells[i];
+
+                if(this.checkGame(rcPair,flag,false)){
+                    return 10;
+                }
+
+                if(this.checkGame(rcPair,flag,true)){
+                    return -10;
+                }
+            }
+            // ends in a tie
+            return 0;
+        }
+    }
+
+
+    //
+
+    // the flag
+    
+    minimax(depth,isMaxPlayer){
+        console.log(this.count)
+        // in terminal state
+        if(this.validCells.length === 0){
+            return this.evaluate(this.flag)
+        } else {
+
+            if(isMaxPlayer){
+                var bestMax = -10000;
+
+                for(let i = 0; i < this.validCells.length; i++ ){
+                    var rcPair = this.validCells[i];
+                    var row = parseInt(rcPair.charAt(0));
+                    var col = parseInt(rcPair.charAt(1));
+
+                    this.board[row][col] = this.player;
+                    // remove in-place
+                    this.validCells.splice(i,1)
+
+                    var score = this.minimax(depth +1, !isMaxPlayer);
+                    
+                    // add-back
+                    this.validCells.splice(i,0,rcPair)
+                    this.board[row][col] = '';
+
+                    if(score > bestMax){
+                        bestMax = score
+                    }
+                }
+                this.count +=1
+                return bestMax;
+            
+            } else {
+                var bestMin = 10000;
+
+                for(let i = 0; i < this.validCells.length; i++ ){
+                    var rcPair = this.validCells[i];
+                    var row = parseInt(rcPair.charAt(0));
+                    var col = parseInt(rcPair.charAt(1));
+
+                    this.board[row][col] = this.player;
+                    // remove in-place
+                    this.validCells.splice(i,1)
+
+                    var score = this.minimax(depth +1, !isMaxPlayer);
+
+                    // add-back
+                    this.validCells.splice(i,0,rcPair)
+                    this.board[row][col] = '';
+
+                    if(score < bestMin){
+                        bestMin = score
+                    }
+                }
+                this.count +=1
+                return bestMin;
+            }
+            
+        }
+    }
+
+    findMove(){
+        var bestRow = -1;
+        var bestCol = -1;
+        var bestScore = -1;
+        // console.log(this.validCells)
+        for(let i = this.validCells.length-1; i >= 0; i-- ){
+            var rcPair = this.validCells[i];
+            var row = parseInt(rcPair.charAt(0));
+            var col = parseInt(rcPair.charAt(1));
+            
+
+            this.board[row][col] = this.player;
+            // remove in-place
+            this.validCells.splice(i,1)
+
+            // this.validCells =  this.validCells.splice(i, 1, rcPair);
+            
+            // console.log("Before")
+            // console.log(this.validCells)
+            
+            var score = this.minimax(0,true);
+            if(score > bestScore){
+                bestRow = row;
+                bestCol = col;
+            }
+            // add-back
+            this.validCells.splice(i,0,rcPair)
+            // this.validCells =this.validCells.splice(i, 0, rcPair);
+            // console.log("After")
+            // console.log(this.validCells)
+            this.board[row][col] = "";
+        }
+    }
+    
 }
 
 // Clear all the data
@@ -174,6 +313,8 @@ function sleep (time) {
     var board_obj = new Board()
     board_obj.setData(persist.board,persist.validCells)
 
+    // console.log(persist);
+    
     var isValid = board_obj.addCell(cell.id,flag);
 
     if(isValid)
@@ -224,6 +365,17 @@ function sleep (time) {
 })
 
 
+// Debug AI
+b = new Board();
+b.findMove()
+
+// var array = [2, 5, 9];
+// var index = array.indexOf(5);
+// if (index > -1) {
+//   array.splice(index, 1);
+// }
+
+// console.log(array)
 
 
 // Sessions work
