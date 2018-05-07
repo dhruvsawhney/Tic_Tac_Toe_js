@@ -3,9 +3,10 @@ const table = document.getElementById("game");
 // to know the player
 var flag = true;
 
-const gameMode = document.getElementById("gameMode")
+// COMMENT OUT FOR AI MODE
+// const gameMode = document.getElementById("gameMode")
+// var isAIMode = false;
 
-var isAIMode = false;
 
 // key1: 'game' for normal version of the game
 // key2: 'ai' for the ai mode of the game
