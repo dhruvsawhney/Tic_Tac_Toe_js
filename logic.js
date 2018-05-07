@@ -464,6 +464,7 @@ function sleep (time) {
 
             if(!result && board_obj.validCells.length === 0){
                 alert("it's a tie!");
+                reset();
             }
 
             if(result){
@@ -478,10 +479,12 @@ function sleep (time) {
                 })
             }
             
-
+            const player_number = document.getElementById("ply");
             if(flag === true){
+                player_number.textContent = "2";
                 flag = false;
             } else {
+                player_number.textContent = "1";
                 flag = true;
             }
         }
