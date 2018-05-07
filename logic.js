@@ -53,19 +53,34 @@ class Board {
             }
             return arr;
         }();
+        // control the remaining number of valid cells on the board
         this.validCells = ["00","01","02","10","11","12","20","21","22"];
+        
         // true -> x, false -> y
         this.flag = true;
         this.player = this.flag ? 'x':'o';
         this.opponent = this.flag ? 'o' : 'x';
         this.count = 0;
     }
-
-    setData(board, validCells){
+    // set the board,validCells, count
+    setData(board, validCells, count){
         this.board = board;
         this.validCells = validCells;
+        this.count = count;
     }
     
+    setPlayer(bool)
+    {
+        if(bool){
+            this.flag = true;
+            this.player = 'x'
+            this.opponent = 'o'
+        } else {
+            this.flag = false;
+            this.player = 'o'
+            this.opponent = 'x'
+        }
+    }
 
     // check if the game has been won
     checkGame (rcPair, flag, checkOpp)
@@ -297,7 +312,8 @@ class Board {
 
 // Clear all the data
 function reset() {
-    state.removeData();
+    state.removeData('game');
+    state.removeData('ai');
     location.reload();
 }
 
@@ -315,80 +331,94 @@ function sleep (time) {
 
     var cell = e.target;
 
-    console.log(cell);
-    
-    // get the data
+    // console.log(cell);
 
-    var persist = state.getData('game');
+    if(isAIMode){
+        
+        var persist = state.getData('ai')
+        var board_obj = new Board();
+        board_obj.setData(persist.board,persist.validCells, persist.count)
 
-    var board_obj = new Board()
-    board_obj.setData(persist.board,persist.validCells)
+        
 
-    // console.log(persist);
-    
-    var isValid = board_obj.addCell(cell.id,flag);
+    } else { // not AI mode
+        // get the data
 
-    if(isValid)
-    {   
-        const h = document.createElement('h1');
-        h.align = "center";
+        var persist = state.getData('game');
 
-        if(flag){
+        var board_obj = new Board()
+        board_obj.setData(persist.board,persist.validCells, persist.count)
+        
+        var isValid = board_obj.addCell(cell.id,flag);
+
+        if(isValid)
+        {   
+            const h = document.createElement('h1');
+            h.align = "center";
+
+            if(flag){
+                
+                var t = document.createTextNode("x");
+                h.appendChild(t);
+
+            } else {
+                var t = document.createTextNode("o");
+                h.appendChild(t);
+            }
             
-            var t = document.createTextNode("x");
-            h.appendChild(t);
+            cell.appendChild(h);
+        }
 
-        } else {
-            var t = document.createTextNode("o");
-            h.appendChild(t);
+        state.saveData('game',board_obj);
+
+        var result = board_obj.checkGame(cell.id,flag);
+
+        if(!result && board_obj.validCells.length === 0){
+            alert("it's a tie!");
+        }
+
+        if(result){
+            if(flag){
+                alert("Player 1 has won");
+            } else{
+                alert("Player 2 has won");
+            }
+            // sleep for user effect
+            sleep(1000).then(() => {
+            reset();
+            })
         }
         
-        cell.appendChild(h);
-    }
 
-    state.saveData('game',board_obj);
-
-    var result = board_obj.checkGame(cell.id,flag);
-
-    if(!result && board_obj.validCells.length === 0){
-        alert("it's a tie!");
-    }
-
-    if(result){
-        if(flag){
-            alert("Player 1 has won");
-        } else{
-            alert("Player 2 has won");
+        if(flag === true){
+            flag = false;
+        } else {
+            flag = true;
         }
-        // sleep for user effect
-        sleep(1000).then(() => {
-          reset();
-        })
     }
     
-
-    if(flag === true){
-        flag = false;
-    } else {
-        flag = true;
-    }
-
+    
 })
 
+// 1 : user goes first
+// 2 : comp goes first
+function ai(){
 
-// function ai(){
-
-//     reset()
-//     var input = prompt("Choose 1 to go first or 2 for comp to go first")
-//     // santize user input
-//     input = input.replace(/\s+/g, '');
-//     if(input === "1" || input === "2"){
-//         return;
-//     } else {
-//         alert("invalid input, please try again")
-//         ai()
-//     }
-// }
+    reset()
+    var input = prompt("Choose 1 to go first or 2 for comp to go first")
+    // santize user input
+    input = input.replace(/\s+/g, '');
+    if(input === "1" || input === "2"){
+        var board_obj = new Board();
+        var bool = "1" ? true : false;
+        board_obj.setPlayer(bool)
+        state.saveData('ai',board_obj);
+        return;
+    } else {
+        alert("invalid input, please try again")
+        ai()
+    }
+}
 
 
 gameMode.addEventListener('click',(e)=> {
@@ -396,6 +426,7 @@ gameMode.addEventListener('click',(e)=> {
     const btn = e.target
 
     if(btn.textContent === "AI mode"){
+        ai();
         isAIMode = true;
         btn.textContent = "User mode"
     } else {
