@@ -2,6 +2,10 @@ const table = document.getElementById("game");
 // to know the player
 var flag = true;
 
+const gameMode = document.getElementById("gameMode")
+
+var isAIMode = false;
+
 // key1: 'game' for normal version of the game
 // key2: 'ai' for the ai mode of the game
 
@@ -372,18 +376,49 @@ function sleep (time) {
 })
 
 
+// function ai(){
 
-b = new Board();
-b.board[0][0] = 'x'
-b.board[0][1] = 'o'
-b.board[0][2] = 'x'
-b.board[1][0] = 'o'
-b.board[1][1] = 'o'
-b.board[1][2] = 'x'
-console.log(b.board)
+//     reset()
+//     var input = prompt("Choose 1 to go first or 2 for comp to go first")
+//     // santize user input
+//     input = input.replace(/\s+/g, '');
+//     if(input === "1" || input === "2"){
+//         return;
+//     } else {
+//         alert("invalid input, please try again")
+//         ai()
+//     }
+// }
 
-var move = b.findMove()
-console.log(move)
+
+gameMode.addEventListener('click',(e)=> {
+
+    const btn = e.target
+
+    if(btn.textContent === "AI mode"){
+        isAIMode = true;
+        btn.textContent = "User mode"
+    } else {
+        isAIMode = false;
+        btn.textContent = "AI mode"
+    }
+    console.log(isAIMode)
+    console.log(btn)
+    console.log(btn.textContent)
+})
+
+
+// b = new Board();
+// b.board[0][0] = 'x'
+// b.board[0][1] = 'o'
+// b.board[0][2] = 'x'
+// b.board[1][0] = 'o'
+// b.board[1][1] = 'o'
+// b.board[1][2] = 'x'
+// console.log(b.board)
+
+// var move = b.findMove()
+// console.log(move)
 
 
 
