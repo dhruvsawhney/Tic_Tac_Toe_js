@@ -1,4 +1,5 @@
 const table = document.getElementById("game");
+
 // to know the player
 var flag = true;
 
@@ -56,17 +57,19 @@ class Board {
         // control the remaining number of valid cells on the board
         this.validCells = ["00","01","02","10","11","12","20","21","22"];
         
+        // X is first person
         // true -> x, false -> y
+        // true means user goes first and gets X
+        // false means comp goes first and gets X
         this.flag = true;
         this.player = this.flag ? 'x':'o';
         this.opponent = this.flag ? 'o' : 'x';
-        this.count = 0;
+        this.isAIMode = false;
     }
     // set the board,validCells, count
-    setData(board, validCells, count){
+    setData(board, validCells){
         this.board = board;
         this.validCells = validCells;
-        this.count = count;
     }
     
     setPlayer(bool)
@@ -327,19 +330,69 @@ function sleep (time) {
  table.addEventListener('click',(e)=> 
 {   
 
-    // console.log(flag);
 
     var cell = e.target;
 
-    // console.log(cell);
+    console.log(cell);
+
+    var row = cell.id.charAt(0).toString()
+    var col = cell.id.charAt(1).toString()
+    
+    var persist = state.getData('game');
+    var board_obj = new Board();
+    board_obj.setData(persist.board,persist.validCells)
+
+    // get the AI MODE for the board object
+    var isAIMode = board_obj.isAIMode;
+
+    console.log(isAIMode);
 
     if(isAIMode){
         
-        var persist = state.getData('ai')
-        var board_obj = new Board();
-        board_obj.setData(persist.board,persist.validCells, persist.count)
 
-        
+        var isValid = board_obj.isOpen(row,col)
+
+        if(flag) {
+            if(isValid){
+                console.log("User Enters")
+
+                // output to screen
+                const h = document.createElement('h1');
+                h.align = "center";
+                var t = document.createTextNode("x");
+                h.appendChild(t);
+                cell.appendChild(h);
+                // board internals
+                board_obj.board[row][col] = 'x';
+                sleep(2000);
+                var lst = board_obj.findMove();
+                board_obj.board[lst[0]][lst[1]] = 'o';
+
+                console.log("Comp enters");
+
+                // output to screen
+                var r = lst[0].toString();
+                var c = lst[1].toString();
+                var rcPair = r + c;
+                const cell2 = document.getElementById(rcPair);
+                
+                console.log(cell2)
+
+                const h2 = document.createElement('h1');
+                h.align = "center";
+                var t2 = document.createTextNode("o");
+                h2.appendChild(t2);
+                cell2.appendChild(h2);
+                
+
+            } else {
+                return;
+            }
+
+        } else {
+            var lst = board_obj.findMove();
+            board_obj.board[lst[0]][lst[1]] = 'o';
+        }   
 
     } else { // not AI mode
         // get the data
@@ -410,8 +463,9 @@ function ai(){
     input = input.replace(/\s+/g, '');
     if(input === "1" || input === "2"){
         var board_obj = new Board();
-        var bool = "1" ? true : false;
-        board_obj.setPlayer(bool)
+        // the global var Flag
+        flag = "1" ? true : false;
+        board_obj.isAIMode = true;
         state.saveData('ai',board_obj);
         return;
     } else {
@@ -422,18 +476,18 @@ function ai(){
 
 
 gameMode.addEventListener('click',(e)=> {
+    e.preventDefault();
 
     const btn = e.target
 
     if(btn.textContent === "AI mode"){
+        
         ai();
-        isAIMode = true;
         btn.textContent = "User mode"
+
     } else {
-        isAIMode = false;
         btn.textContent = "AI mode"
     }
-    console.log(isAIMode)
     console.log(btn)
     console.log(btn.textContent)
 })
