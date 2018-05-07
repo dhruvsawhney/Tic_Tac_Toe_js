@@ -7,10 +7,10 @@ var flag = true;
 
 const state = {
 	storage : localStorage,
-	getData : function()
+	getData : function(key)
 	{
-		if (this.storage.getItem('game')) {
-			return JSON.parse(this.storage.getItem('game')); 
+		if (this.storage.getItem(key)) {
+			return JSON.parse(this.storage.getItem(key)); 
 		} else {
             // store the entire object
             return new Board();
@@ -18,19 +18,19 @@ const state = {
 	},
     // pass the board state
     // input: the Board state
-	saveData: function(obj)
+	saveData: function(key, obj)
 	{	
 
         // stringify before storing data
         strObj = JSON.stringify(obj);
         // console.log("saved data is: ")
         // console.log(strObj)
-		this.storage.setItem('game',strObj);
+		this.storage.setItem(key,strObj);
     },
     
-    removeData: function()
+    removeData: function(key)
     {
-        this.storage.removeItem('game');
+        this.storage.removeItem(key);
     }
 }
 
@@ -315,7 +315,7 @@ function sleep (time) {
     
     // get the data
 
-    var persist = state.getData();
+    var persist = state.getData('game');
 
     var board_obj = new Board()
     board_obj.setData(persist.board,persist.validCells)
@@ -342,7 +342,7 @@ function sleep (time) {
         cell.appendChild(h);
     }
 
-    state.saveData(board_obj);
+    state.saveData('game',board_obj);
 
     var result = board_obj.checkGame(cell.id,flag);
 
