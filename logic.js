@@ -4,8 +4,8 @@ const table = document.getElementById("game");
 var flag = true;
 
 // COMMENT OUT FOR AI MODE
-// const gameMode = document.getElementById("gameMode")
-// var isAIMode = false;
+const gameMode = document.getElementById("gameMode")
+var isAIMode = false;
 
 
 // key1: 'game' for normal version of the game
@@ -16,6 +16,8 @@ const state = {
 	getData : function(key)
 	{
 		if (this.storage.getItem(key)) {
+            console.log(this.storage.getItem(key));
+
 			return JSON.parse(this.storage.getItem(key)); 
 		} else {
             // store the entire object
@@ -213,6 +215,7 @@ class Board {
 
         this.validCells = arr1.concat(arr2);
         
+
         return true;
     }
 
@@ -362,7 +365,10 @@ function sleep (time) {
 {   
 
         var cell = e.target;
-    
+        var row = parseInt(cell.id.charAt(0))
+        var col = parseInt(cell.id.charAt(1))
+
+        // add the persistent data
         var persist = state.getData('game');
 
         var board_obj = new Board()
@@ -373,36 +379,78 @@ function sleep (time) {
 
         if(AIBranch) {
 
-            var x_or_o = null;
+            // var x_or_o = null;
 
-            if(board_obj.count%2 === 0){ // comp turn
-                var lst = board_obj.findMove();
+            // if(board_obj.count%2 === 0){ // comp turn
+            //     var lst = board_obj.findMove();
                 
-                var r = lst[0].toString();
-                var c = lst[1].toString();
+            //     var r = lst[0].toString();
+            //     var c = lst[1].toString();
+            //     var rcPair = r + c;
+
+            //     board_obj.addCellAI(rcPair)
+            //     x_or_o = 'x';
+
+            // } else { // user turn 
+            //     var isValid = board_obj.addCellAI(cell.id)
+
+            //     if(isValid){ // user clicked open cell
+            //         x_or_o = 'o';
+            //     } else { // break the function
+            //         return;
+            //     }
+            // }
+            // board_obj.count +=1;
+            
+            // state.saveData('game');
+
+            // const h = document.createElement('h1');
+            // h.align = "center";
+            // var t = document.createTextNode(x_or_o);
+            // h.appendChild(t)
+            // cell.appendChild(h);
+
+            console.log("user move")
+            var isValid = board_obj.addCellAI(cell.id);
+            board_obj.board[row][col] = 'x'
+            
+            if(isValid){
+                console.log(board_obj)
+                console.log("comp move")
+                var compMoveLst = board_obj.findMove()
+                var r = compMoveLst[0].toString()
+                var c = compMoveLst[1].toString()
                 var rcPair = r + c;
+                var row2 = parseInt(rcPair.charAt(0))
+                var col2 = parseInt(rcPair.charAt(1))
 
                 board_obj.addCellAI(rcPair)
-                x_or_o = 'x';
+                board_obj.board[row2][col2] = 'o'
 
-            } else { // user turn 
-                var isValid = board_obj.addCellAI(cell.id)
+                console.log(compMoveLst)
+                console.log("Before saving the state")
+                console.log(board_obj)
+                // save the data
+                state.saveData('game',board_obj)
 
-                if(isValid){ // user clicked open cell
-                    x_or_o = 'o';
-                } else { // break the function
-                    return;
-                }
+                // user move
+                const h1 = document.createElement('h1');
+                h1.align = "center";
+                var t1 = document.createTextNode('x')
+                h1.appendChild(t1);
+                cell.appendChild(h1);
+                // comp move
+                const h2 = document.createElement('h1')
+                h2.align = "center"
+                var t2 = document.createTextNode('o');
+                h2.appendChild(t2);
+
+                var cell2 = document.getElementById(rcPair);
+                cell2.appendChild(h2);
+
+            } else {
+                return;
             }
-            board_obj.count +=1;
-            
-            state.saveData('game');
-
-            const h = document.createElement('h1');
-            h.align = "center";
-            var t = document.createTextNode(x_or_o);
-            h.appendChild(t)
-            cell.appendChild(h);
 
 
 
@@ -462,62 +510,61 @@ function sleep (time) {
 
 // 1 : user goes first
 // 2 : comp goes first
-function ai(){
+// function ai(){
 
-    reset()
-    var input = prompt("Choose 1 to go first or 2 for comp to go first")
-    // santize user input
-    input = input.replace(/\s+/g, '');
-    if(input === "1" || input === "2"){
-        var board_obj = new Board();
+//     reset()
+//     var input = prompt("Choose 1 to go first or 2 for comp to go first")
+//     // santize user input
+//     input = input.replace(/\s+/g, '');
+//     if(input === "1" || input === "2"){
+//         var board_obj = new Board();
         
-        // // the global var Flag
-        // flag = "1" ? true : false;
+//         // // the global var Flag
+//         // flag = "1" ? true : false;
         
-        board_obj.isAIMode = true;
+//         board_obj.isAIMode = true;
 
-        state.saveData('game',board_obj);
-    } else {
-        alert("invalid input, please try again")
-        
-    }
-    console.log(state.getData('game'))
-}
-
-
-// gameMode.addEventListener('click',(e)=> {
-//     e.preventDefault();
-
-//     const btn = e.target
-
-//     if(btn.textContent === "AI mode"){
-
-//         var bool = true
-
-//         while(bool){
-//             var input = prompt("Choose 1 to go first or 2 for comp to go first")
-//             // santize user input
-//             input = input.replace(/\s+/g, '');
-//             if(input === "1" || input === "2"){
-//                 var board_obj = new Board();
-//                 // the global var Flag
-//                 flag = "1" ? true : false;
-//                 board_obj.isAIMode = true;
-//                 state.saveData('game',board_obj);
-//                 bool = false;
-//             } else {
-//                 alert("invalid input, please try again")       
-//             }
-//         }
-
-//         btn.textContent = "User mode"
-
+//         state.saveData('game',board_obj);
 //     } else {
-//         btn.textContent = "AI mode"
+//         alert("invalid input, please try again")
+        
 //     }
-
 //     console.log(state.getData('game'))
-// })
+// }
+
+
+gameMode.addEventListener('click',(e)=> {
+    e.preventDefault();
+    state.removeData('game');
+
+    const btn = e.target
+    var board_obj = new Board();
+
+    if(btn.textContent === "AI mode"){
+
+        var bool = true
+        while(bool){
+            var input = prompt("Choose 1 to go first or 2 for comp to go first")
+            // santize user input
+            input = input.replace(/\s+/g, '');
+            if(input === "1" || input === "2"){
+                board_obj.isAIMode = true;
+                bool = false;
+            } else {
+                alert("invalid input, please try again")       
+            }
+        }
+
+        btn.textContent = "User mode"
+
+    } else {
+        board_obj.isAIMode = false;
+        btn.textContent = "AI mode"
+    }
+    // save state of object
+    state.saveData('game',board_obj);
+    console.log(state.getData('game'))
+})
 
 
 // b = new Board();
