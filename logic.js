@@ -68,9 +68,10 @@ class Board {
         this.isAIMode = false;
     }
     // set the board,validCells, count
-    setData(board, validCells){
+    setData(board, validCells, isAIMode){
         this.board = board;
         this.validCells = validCells;
+        this.isAIMode = isAIMode;
     }
     
     setPlayer(bool)
@@ -202,11 +203,12 @@ class Board {
                 var r = i.toString();
                 var c = j.toString();
                 var rcPair = r + c;
+                // check if Comp has won
                 if(this.checkGame(rcPair,flag,false)){
                     // console.log(i.toString() + " " +  j.toString() + " " + "10")
                     return 10;
                 }
-        
+                // check if opponent has won
                 if(this.checkGame(rcPair,flag,true)){
                     // console.log(i.toString() + " " +  j.toString() +" " + "-10")
                     return -10;
@@ -268,7 +270,7 @@ class Board {
                         }
                     }
                 }
-                return bestMax + depth;
+                return bestMax;
             
             } else {
                 var bestMin = 10000;
@@ -292,7 +294,7 @@ class Board {
                             }
                         }
                     }
-                return bestMin-depth;
+                return bestMin;
         }
         
     }
@@ -345,8 +347,10 @@ function sleep (time) {
         var persist = state.getData('game');
 
         var board_obj = new Board()
-        board_obj.setData(persist.board,persist.validCells)
+        board_obj.setData(persist.board,persist.validCells, persist.isAIMode)
         
+        console.log(board_obj)
+
         var isValid = board_obj.addCell(cell.id,flag);
 
         if(isValid)
@@ -393,6 +397,8 @@ function sleep (time) {
         } else {
             flag = true;
         }
+
+
     })
 
 
@@ -400,23 +406,27 @@ function sleep (time) {
 
 // 1 : user goes first
 // 2 : comp goes first
-// function ai(){
+function ai(){
 
-//     reset()
-//     var input = prompt("Choose 1 to go first or 2 for comp to go first")
-//     // santize user input
-//     input = input.replace(/\s+/g, '');
-//     if(input === "1" || input === "2"){
-//         var board_obj = new Board();
-//         // the global var Flag
-//         flag = "1" ? true : false;
-//         board_obj.isAIMode = true;
-//         state.saveData('game',board_obj);
-//     } else {
-//         alert("invalid input, please try again")
+    reset()
+    var input = prompt("Choose 1 to go first or 2 for comp to go first")
+    // santize user input
+    input = input.replace(/\s+/g, '');
+    if(input === "1" || input === "2"){
+        var board_obj = new Board();
         
-//     }
-// }
+        // // the global var Flag
+        // flag = "1" ? true : false;
+        
+        board_obj.isAIMode = true;
+
+        state.saveData('game',board_obj);
+    } else {
+        alert("invalid input, please try again")
+        
+    }
+    console.log(state.getData('game'))
+}
 
 
 // gameMode.addEventListener('click',(e)=> {
@@ -454,17 +464,17 @@ function sleep (time) {
 // })
 
 
-// b = new Board();
-// b.board[0][0] = 'x'
-// b.board[0][1] = 'o'
-// b.board[0][2] = 'x'
-// b.board[1][0] = 'o'
-// b.board[1][1] = 'o'
-// b.board[1][2] = 'x'
-// console.log(b.board)
+b = new Board();
+b.board[0][0] = 'x'
+b.board[0][1] = 'o'
+b.board[0][2] = 'x'
+b.board[1][0] = 'o'
+b.board[1][1] = 'o'
+b.board[1][2] = 'x'
+console.log(b.board)
 
-// var move = b.findMove()
-// console.log(move)
+var move = b.findMove()
+console.log(move)
 
 
 
