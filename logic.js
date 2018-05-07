@@ -2,6 +2,9 @@ const table = document.getElementById("game");
 // to know the player
 var flag = true;
 
+// key1: 'game' for normal version of the game
+// key2: 'ai' for the ai mode of the game
+
 const state = {
 	storage : localStorage,
 	getData : function()
@@ -167,14 +170,12 @@ class Board {
                 var c = j.toString();
                 var rcPair = r + c;
                 if(this.checkGame(rcPair,flag,false)){
-                    console.log(i.toString() + " " +  j.toString() + " " + "10")
-                    console.log()
+                    // console.log(i.toString() + " " +  j.toString() + " " + "10")
                     return 10;
                 }
         
                 if(this.checkGame(rcPair,flag,true)){
-                    console.log(i.toString() + " " +  j.toString() +" " + "-10")
-                    console.log()
+                    // console.log(i.toString() + " " +  j.toString() +" " + "-10")
                     return -10;
                 }
             }
@@ -224,7 +225,6 @@ class Board {
                         
                         this.board[i][j] = this.player;
                         isMaxPlayer = !isMaxPlayer
-                        console.log(this.board)
                         var score = this.minimax(depth +1, isMaxPlayer);
                     
                         this.board[row][col] = "";
@@ -235,7 +235,7 @@ class Board {
                         }
                     }
                 }
-                return bestMax;
+                return bestMax + depth;
             
             } else {
                 var bestMin = 10000;
@@ -259,7 +259,7 @@ class Board {
                             }
                         }
                     }
-                return bestMin;
+                return bestMin-depth;
         }
         
     }
@@ -276,7 +276,6 @@ class Board {
                     this.board[i][j] = this.player;
             
                     var score = this.minimax(0,false);
-                    console.log ("score is: " + score.toString())
                     if(score > bestScore){
                         bestRow = i;
                         bestCol = j;
@@ -289,10 +288,7 @@ class Board {
         }
 
         return [bestRow,bestCol,bestScore];
-    }        
-        
-    
-    
+    }            
 }
 
 // Clear all the data
