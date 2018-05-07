@@ -5,7 +5,7 @@ var flag = true;
 
 // COMMENT OUT FOR AI MODE
 const gameMode = document.getElementById("gameMode")
-var isAIMode = false;
+
 
 
 // key1: 'game' for normal version of the game
@@ -16,8 +16,6 @@ const state = {
 	getData : function(key)
 	{
 		if (this.storage.getItem(key)) {
-            console.log(this.storage.getItem(key));
-
 			return JSON.parse(this.storage.getItem(key)); 
 		} else {
             // store the entire object
@@ -31,8 +29,6 @@ const state = {
 
         // stringify before storing data
         strObj = JSON.stringify(obj);
-        // console.log("saved data is: ")
-        // console.log(strObj)
 		this.storage.setItem(key,strObj);
     },
     
@@ -379,37 +375,6 @@ function sleep (time) {
 
         if(AIBranch) {
 
-            // var x_or_o = null;
-
-            // if(board_obj.count%2 === 0){ // comp turn
-            //     var lst = board_obj.findMove();
-                
-            //     var r = lst[0].toString();
-            //     var c = lst[1].toString();
-            //     var rcPair = r + c;
-
-            //     board_obj.addCellAI(rcPair)
-            //     x_or_o = 'x';
-
-            // } else { // user turn 
-            //     var isValid = board_obj.addCellAI(cell.id)
-
-            //     if(isValid){ // user clicked open cell
-            //         x_or_o = 'o';
-            //     } else { // break the function
-            //         return;
-            //     }
-            // }
-            // board_obj.count +=1;
-            
-            // state.saveData('game');
-
-            // const h = document.createElement('h1');
-            // h.align = "center";
-            // var t = document.createTextNode(x_or_o);
-            // h.appendChild(t)
-            // cell.appendChild(h);
-
             console.log("user move")
             var isValid = board_obj.addCellAI(cell.id);
             board_obj.board[row][col] = 'x'
@@ -427,10 +392,8 @@ function sleep (time) {
                 board_obj.addCellAI(rcPair)
                 board_obj.board[row2][col2] = 'o'
 
-                console.log(compMoveLst)
-                console.log("Before saving the state")
-                console.log(board_obj)
-                // save the data
+
+                // save the data with the object !
                 state.saveData('game',board_obj)
 
                 // user move
@@ -447,6 +410,26 @@ function sleep (time) {
 
                 var cell2 = document.getElementById(rcPair);
                 cell2.appendChild(h2);
+
+                // check who won
+                var result = board_obj.evaluate(true)
+                var isOver = false;
+
+                if(result === 10){
+                    isOver = true
+                    alert("You won!")
+                } else if (result === -10){
+                    isOver = true
+                    alert("Comp won")
+                } else if(board_obj.validCells.length === 1){
+                    isOver = true
+                    alert("it's a tie!")
+                }
+                
+                if(isOver){
+                    state.removeData('game')
+                    location.reload();
+                }
 
             } else {
                 return;
@@ -507,32 +490,6 @@ function sleep (time) {
 
 
 
-
-// 1 : user goes first
-// 2 : comp goes first
-// function ai(){
-
-//     reset()
-//     var input = prompt("Choose 1 to go first or 2 for comp to go first")
-//     // santize user input
-//     input = input.replace(/\s+/g, '');
-//     if(input === "1" || input === "2"){
-//         var board_obj = new Board();
-        
-//         // // the global var Flag
-//         // flag = "1" ? true : false;
-        
-//         board_obj.isAIMode = true;
-
-//         state.saveData('game',board_obj);
-//     } else {
-//         alert("invalid input, please try again")
-        
-//     }
-//     console.log(state.getData('game'))
-// }
-
-
 gameMode.addEventListener('click',(e)=> {
     e.preventDefault();
     state.removeData('game');
@@ -542,19 +499,7 @@ gameMode.addEventListener('click',(e)=> {
 
     if(btn.textContent === "AI mode"){
 
-        var bool = true
-        while(bool){
-            var input = prompt("Choose 1 to go first or 2 for comp to go first")
-            // santize user input
-            input = input.replace(/\s+/g, '');
-            if(input === "1" || input === "2"){
-                board_obj.isAIMode = true;
-                bool = false;
-            } else {
-                alert("invalid input, please try again")       
-            }
-        }
-
+        board_obj.isAIMode = true;
         btn.textContent = "User mode"
 
     } else {
@@ -563,9 +508,10 @@ gameMode.addEventListener('click',(e)=> {
     }
     // save state of object
     state.saveData('game',board_obj);
-    console.log(state.getData('game'))
 })
 
+
+// Testing the AI
 
 // b = new Board();
 // b.board[0][0] = 'x'
@@ -578,8 +524,6 @@ gameMode.addEventListener('click',(e)=> {
 
 // var move = b.findMove()
 // console.log(move)
-
-
 
 
 
