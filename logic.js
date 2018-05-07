@@ -1,16 +1,13 @@
+// Changes text on the page to give user cue to move
+const player_number = document.getElementById("ply");
+// the 3x3 grid displayed on the screen
 const table = document.getElementById("game");
-
-// to know the player
+// The Flag is used for the User Mode to switch between X and O states
 var flag = true;
-
-// COMMENT OUT FOR AI MODE
+// this is the btn used to switch between user and ai mode
 const gameMode = document.getElementById("gameMode")
 
-
-
-// key1: 'game' for normal version of the game
-// key2: 'ai' for the ai mode of the game
-
+// The layer for data persistance
 const state = {
 	storage : localStorage,
 	getData : function(key)
@@ -38,6 +35,8 @@ const state = {
     }
 }
 
+// The class for the Board that encapsulates logic of the game
+
 class Board {
     constructor() {
         this.board = function () {
@@ -64,8 +63,6 @@ class Board {
         this.player = this.flag ? 'x':'o';
         this.opponent = this.flag ? 'o' : 'x';
         this.isAIMode = false;
-
-        this.count = 0;
     }
     // set the board,validCells, count
     setData(board, validCells, isAIMode){
@@ -74,18 +71,6 @@ class Board {
         this.isAIMode = isAIMode;
     }
     
-    setPlayer(bool)
-    {
-        if(bool){
-            this.flag = true;
-            this.player = 'x'
-            this.opponent = 'o'
-        } else {
-            this.flag = false;
-            this.player = 'o'
-            this.opponent = 'x'
-        }
-    }
 
     // check if the game has been won
     checkGame (rcPair, flag, checkOpp)
@@ -160,17 +145,6 @@ class Board {
         return false;
     }
     
-    removeValidCell(rcPair){
-        var index = this.validCells.indexOf(rcPair);
-
-        var arr1 = this.validCells.slice(0,index)
-        var arr2 = this.validCells.slice(index+1)
-
-        this.validCells = arr1.concat(arr2);
-
-    }
-
-
     // add cell to board and remove it from ValidCells list
     addCell(rcPair,flag)
     {   
@@ -211,7 +185,6 @@ class Board {
 
         this.validCells = arr1.concat(arr2);
         
-
         return true;
     }
 
@@ -238,6 +211,7 @@ class Board {
         return 0;
     }
 
+    // check if the board is filled
     checkOver(){
         for(let i = 0; i < this.board.length; i++){
             for(let j = 0; j < this.board[i].length; j++){
@@ -249,10 +223,12 @@ class Board {
         return true;
     }
 
+    // check if a cell is open on the board
     isOpen(i,j){
         return this.board[i][j] === "";
     }
 
+    // minimax algorithm 
     // the flag wrt comp ('x')
     minimax(depth,isMaxPlayer){
         var score = this.evaluate(this.flag);
@@ -318,6 +294,7 @@ class Board {
         
     }
 
+    // the driver function for the AI move
     findMove(){
         var bestRow = -1;
         var bestCol = -1;
@@ -357,6 +334,10 @@ function sleep (time) {
   }
 
   
+// The event Listner for the board that (1) works for user and AI mode
+// (2) edits and saves state of board object 
+// (3) Renders the updated board to the User
+
  table.addEventListener('click',(e)=> 
 {   
 
@@ -375,13 +356,14 @@ function sleep (time) {
 
         if(AIBranch) {
 
-            console.log("user move")
             var isValid = board_obj.addCellAI(cell.id);
             board_obj.board[row][col] = 'x'
             
+            
             if(isValid){
-                console.log(board_obj)
-                console.log("comp move")
+                player_number.textContent = "Comp";
+
+
                 var compMoveLst = board_obj.findMove()
                 var r = compMoveLst[0].toString()
                 var c = compMoveLst[1].toString()
@@ -431,11 +413,10 @@ function sleep (time) {
                     location.reload();
                 }
 
+                player_number.textContent = "User";
             } else {
                 return;
             }
-
-
 
         } else {
             var isValid = board_obj.addCell(cell.id,flag);
@@ -478,8 +459,7 @@ function sleep (time) {
                 reset();
                 })
             }
-            
-            const player_number = document.getElementById("ply");
+        
             if(flag === true){
                 player_number.textContent = "2";
                 flag = false;
@@ -492,7 +472,7 @@ function sleep (time) {
     })
 
 
-
+// Event listner to switch between User and AI states
 gameMode.addEventListener('click',(e)=> {
     e.preventDefault();
     state.removeData('game');
@@ -504,14 +484,20 @@ gameMode.addEventListener('click',(e)=> {
 
         board_obj.isAIMode = true;
         btn.textContent = "User mode"
+        
+        player_number.textContent = "User moves as X, Comp moves as O"
 
     } else {
         board_obj.isAIMode = false;
         btn.textContent = "AI mode"
+        
+        player_number.textContent = "1"
     }
     // save state of object
     state.saveData('game',board_obj);
+
 })
+
 
 
 // Testing the AI
