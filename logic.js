@@ -66,6 +66,8 @@ class Board {
         this.player = this.flag ? 'x':'o';
         this.opponent = this.flag ? 'o' : 'x';
         this.isAIMode = false;
+
+        this.count = 0;
     }
     // set the board,validCells, count
     setData(board, validCells, isAIMode){
@@ -170,6 +172,8 @@ class Board {
 
     }
 
+
+    // add cell to board and remove it from ValidCells list
     addCell(rcPair,flag)
     {   
         // not a valid element
@@ -184,6 +188,22 @@ class Board {
             this.board[r][c] = 'x';
         } else {
             this.board[r][c] = 'o';
+        }
+
+        var index = this.validCells.indexOf(rcPair);
+
+        var arr1 = this.validCells.slice(0,index)
+        var arr2 = this.validCells.slice(index+1)
+
+        this.validCells = arr1.concat(arr2);
+        
+        return true;
+    }
+
+    // overload for AI
+    addCellAI(rcPair){
+        if(!this.validCells.includes(rcPair)){
+            return false;
         }
 
         var index = this.validCells.indexOf(rcPair);
@@ -316,7 +336,6 @@ class Board {
                         bestCol = j;
                         bestScore = score;
                     }
-            
                     this.board[i][j] = "";
                 }
             }
@@ -349,55 +368,92 @@ function sleep (time) {
         var board_obj = new Board()
         board_obj.setData(persist.board,persist.validCells, persist.isAIMode)
         
-        console.log(board_obj)
+        //  lines above are common to both the branches
+        var AIBranch = board_obj.isAIMode;
 
-        var isValid = board_obj.addCell(cell.id,flag);
+        if(AIBranch) {
 
-        if(isValid)
-        {   
+            var x_or_o = null;
+
+            if(board_obj.count%2 === 0){ // comp turn
+                var lst = board_obj.findMove();
+                
+                var r = lst[0].toString();
+                var c = lst[1].toString();
+                var rcPair = r + c;
+
+                board_obj.addCellAI(rcPair)
+                x_or_o = 'x';
+
+            } else { // user turn 
+                var isValid = board_obj.addCellAI(cell.id)
+
+                if(isValid){ // user clicked open cell
+                    x_or_o = 'o';
+                } else { // break the function
+                    return;
+                }
+            }
+            board_obj.count +=1;
+            
+            state.saveData('game');
+
             const h = document.createElement('h1');
             h.align = "center";
+            var t = document.createTextNode(x_or_o);
+            h.appendChild(t)
+            cell.appendChild(h);
 
-            if(flag){
+
+
+        } else {
+            var isValid = board_obj.addCell(cell.id,flag);
+
+            if(isValid)
+            {   
+                const h = document.createElement('h1');
+                h.align = "center";
+
+                if(flag){
+                    
+                    var t = document.createTextNode("x");
+                    h.appendChild(t);
+
+                } else {
+                    var t = document.createTextNode("o");
+                    h.appendChild(t);
+                }
                 
-                var t = document.createTextNode("x");
-                h.appendChild(t);
+                cell.appendChild(h);
+            }
 
-            } else {
-                var t = document.createTextNode("o");
-                h.appendChild(t);
+            state.saveData('game',board_obj);
+
+            var result = board_obj.checkGame(cell.id,flag);
+
+            if(!result && board_obj.validCells.length === 0){
+                alert("it's a tie!");
+            }
+
+            if(result){
+                if(flag){
+                    alert("Player 1 has won");
+                } else{
+                    alert("Player 2 has won");
+                }
+                // sleep for user effect
+                sleep(1000).then(() => {
+                reset();
+                })
             }
             
-            cell.appendChild(h);
-        }
 
-        state.saveData('game',board_obj);
-
-        var result = board_obj.checkGame(cell.id,flag);
-
-        if(!result && board_obj.validCells.length === 0){
-            alert("it's a tie!");
-        }
-
-        if(result){
-            if(flag){
-                alert("Player 1 has won");
-            } else{
-                alert("Player 2 has won");
+            if(flag === true){
+                flag = false;
+            } else {
+                flag = true;
             }
-            // sleep for user effect
-            sleep(1000).then(() => {
-            reset();
-            })
         }
-        
-
-        if(flag === true){
-            flag = false;
-        } else {
-            flag = true;
-        }
-
 
     })
 
@@ -464,17 +520,17 @@ function ai(){
 // })
 
 
-b = new Board();
-b.board[0][0] = 'x'
-b.board[0][1] = 'o'
-b.board[0][2] = 'x'
-b.board[1][0] = 'o'
-b.board[1][1] = 'o'
-b.board[1][2] = 'x'
-console.log(b.board)
+// b = new Board();
+// b.board[0][0] = 'x'
+// b.board[0][1] = 'o'
+// b.board[0][2] = 'x'
+// b.board[1][0] = 'o'
+// b.board[1][1] = 'o'
+// b.board[1][2] = 'x'
+// console.log(b.board)
 
-var move = b.findMove()
-console.log(move)
+// var move = b.findMove()
+// console.log(move)
 
 
 
